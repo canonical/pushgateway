@@ -1,0 +1,51 @@
+FROM golang:1.16 as golang
+RUN go version
+
+FROM ubuntu:20.04 as builder
+
+COPY --from=golang /usr/local/go/ /usr/local/go/
+ENV PATH /usr/local/go/bin:$PATH
+ENV GO111MODULE=on
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN true
+
+ARG http_proxy
+ARG https_proxy
+ARG no_proxy
+ARG NO_PROXY
+ARG GOPROXY
+ARG GOSUMDB
+
+RUN apt-get update && apt-get --no-install-recommends install -y \
+    git \
+    make \
+    apt-utils \
+    apt-transport-https \
+    tzdata \
+    ca-certificates \
+    wget \
+    gcc \
+    curl \
+    build-essential \
+    zip && \
+    apt-get clean \
+    && rm -rf \
+        /var/lib/apt/lists/* \
+        /tmp/* \
+        /var/tmp/* \
+        /usr/share/man \
+        /usr/share/doc \
+        /usr/share/doc-base
+
+RUN mkdir pushgateway-ubuntu
+WORKDIR pushgateway-ubuntu
+COPY . /pushgateway-ubuntu
+RUN go version
+
+RUN make
+
+FROM ubuntu:20.04 as pushgateway
+
+COPY --from=builder /pushgateway-ubuntu/pushgateway /bin/pushgateway
+EXPOSE 9091
+ENTRYPOINT [ "/bin/pushgateway" ]
