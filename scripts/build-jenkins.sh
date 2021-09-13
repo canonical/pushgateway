@@ -11,7 +11,7 @@ DOCKER=${DOCKER:-docker}
 
 VERSION=`git rev-parse --verify HEAD`
 
-$DOCKER -f Dockerfile.ubuntu build \
+$DOCKER Dockerfile.ubuntu build \
 	--build-arg http_proxy \
 	--build-arg https_proxy \
 	--build-arg no_proxy \
