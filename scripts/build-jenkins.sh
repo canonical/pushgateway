@@ -17,6 +17,6 @@ $DOCKER build \
 	--build-arg no_proxy \
 	--build-arg NO_PROXY \
 	-t ${DOCKER_REGISTRY}/pushgateway-ubuntu:$VERSION \
-  -t ${DOCKER_REGISTRY}/pushgateway-ubuntu:latest ./Dockerfile.ubuntu
+  -t ${DOCKER_REGISTRY}/pushgateway-ubuntu:latest -f Dockerfile.ubuntu .
 
 $DOCKER push --all-tags ${DOCKER_REGISTRY}/pushgateway-ubuntu
